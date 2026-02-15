@@ -46,6 +46,7 @@ mod tsc_cmd;
 mod utils;
 mod vitest_cmd;
 mod wget_cmd;
+mod wrangler_cmd;
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
@@ -526,6 +527,12 @@ enum Commands {
         #[arg(short, long, default_value = "7")]
         since: u64,
     },
+
+    /// Wrangler (Cloudflare Workers CLI) with compact output
+    Wrangler {
+        #[command(subcommand)]
+        command: WranglerCommands,
+    },
 }
 
 #[derive(Subcommand)]
@@ -837,6 +844,31 @@ enum GoCommands {
         args: Vec<String>,
     },
     /// Passthrough: runs any unsupported go subcommand directly
+    #[command(external_subcommand)]
+    Other(Vec<OsString>),
+}
+
+#[derive(Subcommand)]
+enum WranglerCommands {
+    /// Deploy Workers with compact output (URL + size + version)
+    Deploy {
+        /// Additional wrangler deploy arguments
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
+    /// Pages deploy with compact output
+    Pages {
+        /// Additional wrangler pages arguments
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
+    /// Dev server (passthrough with inherited I/O)
+    Dev {
+        /// Additional wrangler dev arguments
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
+    /// Passthrough: runs any unsupported wrangler subcommand directly
     #[command(external_subcommand)]
     Other(Vec<OsString>),
 }
@@ -1409,6 +1441,21 @@ fn main() -> Result<()> {
         Commands::HookAudit { since } => {
             hook_audit_cmd::run(since, cli.verbose)?;
         }
+
+        Commands::Wrangler { command } => match command {
+            WranglerCommands::Deploy { args } => {
+                wrangler_cmd::run_deploy(&args, cli.verbose)?;
+            }
+            WranglerCommands::Pages { args } => {
+                wrangler_cmd::run_pages(&args, cli.verbose)?;
+            }
+            WranglerCommands::Dev { args } => {
+                wrangler_cmd::run_dev(&args, cli.verbose)?;
+            }
+            WranglerCommands::Other(args) => {
+                wrangler_cmd::run_passthrough(&args, cli.verbose)?;
+            }
+        },
 
         Commands::Proxy { args } => {
             use std::process::Command;
