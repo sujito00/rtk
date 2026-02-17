@@ -224,6 +224,8 @@ PYTHON            ruff_cmd.rs       ruff check/format      80%+       ✓
 GO                go_cmd.rs         go test/build/vet      75-90%     ✓
                   golangci_cmd.rs   golangci-lint          85%        ✓
 
+CLOUDFLARE        wrangler_cmd.rs   wrangler deploy/dev    80-90%     ✓
+
 NETWORK           wget_cmd.rs       wget                   85-95%     ✓
 
 DEPENDENCIES      deps.rs           deps                   80-90%     ✓
@@ -240,7 +242,7 @@ SHARED            utils.rs          Helpers                N/A        ✓
                   tee.rs            Full output recovery   N/A        ✓
 ```
 
-**Total: 48 modules** (30 command modules + 18 infrastructure modules)
+**Total: 49 modules** (31 command modules + 18 infrastructure modules)
 
 ### Module Count Breakdown
 
@@ -1435,4 +1437,4 @@ When implementing a new command, consider:
 
 **Last Updated**: 2026-02-12
 **Architecture Version**: 2.1
-**rtk Version**: 0.20.1
+**rtk Version**: 0.21.1
