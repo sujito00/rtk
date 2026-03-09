@@ -185,6 +185,15 @@ elif echo "$MATCH_CMD" | grep -qE '^go[[:space:]]+vet([[:space:]]|$)'; then
   REWRITTEN="${ENV_PREFIX}$(echo "$CMD_BODY" | sed 's/^go vet/rtk go vet/')"
 elif echo "$MATCH_CMD" | grep -qE '^golangci-lint([[:space:]]|$)'; then
   REWRITTEN="${ENV_PREFIX}$(echo "$CMD_BODY" | sed 's/^golangci-lint/rtk golangci-lint/')"
+
+# --- Cloudflare Wrangler ---
+elif echo "$MATCH_CMD" | grep -qE '^(npx[[:space:]]+|bunx[[:space:]]+|pnpm[[:space:]]+)?wrangler[[:space:]]'; then
+  WRANGLER_SUBCMD=$(echo "$MATCH_CMD" | sed -E 's/^(npx|bunx|pnpm)[[:space:]]+//' | sed -E 's/^wrangler[[:space:]]+//')
+  case "$WRANGLER_SUBCMD" in
+    deploy|deploy\ *|pages|pages\ *|dev|dev\ *)
+      REWRITTEN="${ENV_PREFIX}$(echo "$CMD_BODY" | sed -E 's/^(npx |bunx |pnpm )?wrangler /rtk wrangler /')"
+      ;;
+  esac
 fi
 
 # If no rewrite needed, approve as-is

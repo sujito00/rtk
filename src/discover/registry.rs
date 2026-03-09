@@ -70,6 +70,7 @@ const PATTERNS: &[&str] = &[
     r"^kubectl\s+(get|logs)",
     r"^curl\s+",
     r"^wget\s+",
+    r"^(npx\s+|bunx\s+|pnpm\s+)?wrangler\s+(deploy|pages|dev)",
 ];
 
 const RULES: &[RtkRule] = &[
@@ -224,6 +225,21 @@ const RULES: &[RtkRule] = &[
         savings_pct: 65.0,
         subcmd_savings: &[],
         subcmd_status: &[],
+    },
+    RtkRule {
+        rtk_cmd: "rtk wrangler",
+        category: "Infra",
+        savings_pct: 70.0,
+        subcmd_savings: &[
+            ("deploy", 75.0),
+            ("pages", 70.0),
+            ("dev", 30.0),
+        ],
+        subcmd_status: &[
+            ("deploy", super::report::RtkStatus::Existing),
+            ("pages", super::report::RtkStatus::Existing),
+            ("dev", super::report::RtkStatus::Passthrough),
+        ],
     },
 ];
 
